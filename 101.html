@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Meme Generator</title>
+    </head>
+    <body>
+        <p>
+            <label for="top">Enter top text:</label>
+            <textarea id="top-text" name="top"></textarea><br><br>
+            Top text size: <input type="range" id="top-text-size-input" min="0.05" max="0.25" value="0.15" step="0.01">
+        </p>
+        <p>
+            <label for="bottom">Enter bottom text:</label>
+            <textarea id="bottom-text" name="bottom"></textarea><br><br>
+            Text size: <input type="range" id="bottom-text-size-input" min="0.05" max="0.25" value="0.15" step="0.01">
+        </p>
+        <p>
+            <label for="width">Enter width: </label>
+            <input type="number" name="width" id="width" placeholder="Enter here" value="200">
+        </p>
+        <p>
+            <label for="height">Enter height:</label>
+            <input type="number" name="height" id="height" placeholder="Enter here" value="200">
+        </p>
+        <p>
+            <input type="file" id="image-input">
+        </p>
+        <p>
+            <button id="generate-btn">Generate!</button>
+        </p>
+        <p>
+            <button id="download" onclick="download()">Download</button>
+        </p>
+        <p>
+            <canvas id="meme" title="Right click -> &quot;Save image as...&quot;"></canvas>
+        </p>
+        <script>
+            var topTextInput, bottomTextInput, topTextSizeInput, bottomTextSizeInput, imageInput, generateBtn, canvas, ctx,width,height;
+
+
+function generateMeme (img, topText, bottomText, topTextSize, bottomTextSize,width,height) {
+    var fontSize;
+    canvas.width = width;
+    canvas.height = height;
+
+    console.log(width);    
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0,canvas.width,canvas.height);
+
+    ctx.fillStyle = 'black';
+    ctx.textAlign = 'center';
+
+    fontSize = canvas.width * topTextSize;
+    ctx.font = fontSize + 'px Arial';
+    ctx.lineWidth = fontSize / 20;
+
+    ctx.textBaseline = 'top';
+    topText.split('\n').forEach(function (t, i) {
+        ctx.fillText(t, canvas.width / 2, i * fontSize, canvas.width);
+    });
+
+    fontSize = canvas.width * bottomTextSize;
+    ctx.font = fontSize + 'px Arial';
+    ctx.lineWidth = fontSize / 20;
+
+    ctx.textBaseline = 'bottom';
+    bottomText.split('\n').reverse().forEach(function (t, i) { 
+        ctx.fillText(t, canvas.width / 2, canvas.height - i * fontSize, canvas.width);
+    });
+}
+
+function init () {
+    topTextInput = document.getElementById('top-text');
+    bottomTextInput = document.getElementById('bottom-text');
+    topTextSizeInput = document.getElementById('top-text-size-input');
+    bottomTextSizeInput = document.getElementById('bottom-text-size-input');
+    imageInput = document.getElementById('image-input');
+    generateBtn = document.getElementById('generate-btn');
+    canvas = document.getElementById('meme');
+    width = document.getElementById('width');
+    height = document.getElementById('height');
+    
+    ctx = canvas.getContext('2d');
+
+    canvas.width = canvas.height = 0;
+
+    topTextInput.value = bottomTextInput.value = '';
+
+    generateBtn.addEventListener('click', function () {
+        var reader = new FileReader();
+        reader.onload = function () {
+            console.log(reader);
+            var img = new Image;
+            img.src = reader.result;
+            generateMeme(img, topTextInput.value, bottomTextInput.value, topTextSizeInput.value, bottomTextSizeInput.value,width.value,height.value);
+        };
+        reader.readAsDataURL(imageInput.files[0]);
+    });
+}
+
+function download() {
+    var canvas = document.getElementById('meme');
+    var image = canvas.toDataURL("image/png");
+    var link = document.createElement('a');
+    link.download = "download.png";
+    link.href = image;
+    link.click();
+}
+
+init();
+            
+        </script>
+    </body>
+</html>
